@@ -19,4 +19,10 @@ class TextStyles {
     fontSize: 16.0,
     color: AppColors.darkGrey,
   );
+
+  static const TextStyle subtitle = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.bold,
+    color: AppColors.darkGrey,
+  );
 }
