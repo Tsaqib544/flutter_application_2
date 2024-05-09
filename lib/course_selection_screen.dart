@@ -1,6 +1,6 @@
-// course_selection_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/survey_feedback_screen.dart';
+import 'package:flutter_application_2/course_feedback_form.dart';
+import 'package:flutter_application_2/dosen_feedback_form.dart';
 import 'package:flutter_application_2/styles.dart';
 
 class CourseSelectionScreen extends StatelessWidget {
@@ -10,8 +10,10 @@ class CourseSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Silahkan Pilih Dosen atau Mata Kuliah',
-            style: TextStyles.title),
+        title: Text(
+          'Silahkan Pilih Dosen atau Mata Kuliah',
+          style: TextStyles.title,
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -28,7 +30,7 @@ class CourseSelectionScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SurveyFeedbackScreen(title: 'Vihi Atina, M.Kom'),
+                        DosenFeedbackForm(dosenName: 'Vihi Atina, M.Kom'),
                   ),
                 );
               },
@@ -41,7 +43,7 @@ class CourseSelectionScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SurveyFeedbackScreen(title: 'Triyono, M.Kom'),
+                        DosenFeedbackForm(dosenName: 'Triyono, M.Kom'),
                   ),
                 );
               },
@@ -53,12 +55,15 @@ class CourseSelectionScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SurveyFeedbackScreen(
-                        title: 'Joni Maulindar, S.T, M.Kom'),
+                    builder: (context) => DosenFeedbackForm(
+                        dosenName: 'Joni Maulindar, S.T, M.Kom'),
                   ),
                 );
               },
-              child: Text('Joni Maulindar, S.T, M.Kom', style: TextStyles.body),
+              child: Text(
+                'Joni Maulindar, S.T, M.Kom',
+                style: TextStyles.body,
+              ),
             ),
             SizedBox(height: 32.0),
             Text('Mata Kuliah', style: TextStyles.subtitle),
@@ -69,7 +74,7 @@ class CourseSelectionScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SurveyFeedbackScreen(title: 'Pemrograman Mobile'),
+                        CourseFeedbackForm(courseName: 'Pemrograman Mobile'),
                   ),
                 );
               },
@@ -81,13 +86,15 @@ class CourseSelectionScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SurveyFeedbackScreen(
-                        title: 'Kecerdasan Mesin dan Buatan'),
+                    builder: (context) => CourseFeedbackForm(
+                        courseName: 'Kecerdasan Mesin dan Buatan'),
                   ),
                 );
               },
-              child:
-                  Text('Kecerdasan Mesin dan Buatan', style: TextStyles.body),
+              child: Text(
+                'Kecerdasan Mesin dan Buatan',
+                style: TextStyles.body,
+              ),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
@@ -96,7 +103,7 @@ class CourseSelectionScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SurveyFeedbackScreen(title: 'Pemrograman Visual'),
+                        CourseFeedbackForm(courseName: 'Pemrograman Visual'),
                   ),
                 );
               },

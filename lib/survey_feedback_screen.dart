@@ -1,143 +1,117 @@
-// survey_feedback_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/styles.dart';
+import 'package:flutter_application_2/dosen_feedback_form.dart';
+import 'package:flutter_application_2/course_feedback_form.dart';
 
-class SurveyFeedbackScreen extends StatelessWidget {
-  final String title;
-
-  const SurveyFeedbackScreen({Key? key, required this.title}) : super(key: key);
+class CourseSelectionScreen extends StatelessWidget {
+  const CourseSelectionScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Feedback & Survey', style: TextStyles.title),
+        title: Text(
+          'Silahkan Pilih Dosen atau Mata Kuliah',
+          style: TextStyles.title,
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              title,
-              style: TextStyles.subtitle,
+            Text('Dosen', style: TextStyles.subtitle),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DosenFeedbackForm(dosenName: 'Vihi Atina, M.Kom'),
+                  ),
+                );
+              },
+              child: Text('Vihi Atina, M.Kom', style: TextStyles.body),
             ),
             SizedBox(height: 16.0),
-            if (title.contains('Dosen'))
-              _buildDosenForm()
-            else if (title.contains('Mata Kuliah'))
-              _buildMataKuliahForm(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DosenFeedbackForm(dosenName: 'Triyono, M.Kom'),
+                  ),
+                );
+              },
+              child: Text('Triyono, M.Kom', style: TextStyles.body),
+            ),
             SizedBox(height: 16.0),
-            _buildFeedbackForm(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DosenFeedbackForm(
+                        dosenName: 'Joni Maulindar, S.T, M.Kom'),
+                  ),
+                );
+              },
+              child: Text(
+                'Joni Maulindar, S.T, M.Kom',
+                style: TextStyles.body,
+              ),
+            ),
+            SizedBox(height: 32.0),
+            Text('Mata Kuliah', style: TextStyles.subtitle),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CourseFeedbackForm(courseName: 'Pemrograman Mobile'),
+                  ),
+                );
+              },
+              child: Text('Pemrograman Mobile', style: TextStyles.body),
+            ),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CourseFeedbackForm(
+                        courseName: 'Kecerdasan Mesin dan Buatan'),
+                  ),
+                );
+              },
+              child: Text(
+                'Kecerdasan Mesin dan Buatan',
+                style: TextStyles.body,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CourseFeedbackForm(courseName: 'Pemrograman Visual'),
+                  ),
+                );
+              },
+              child: Text('Pemrograman Visual', style: TextStyles.body),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDosenForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Penilaian Dosen',
-          style: TextStyles.body,
-        ),
-        SizedBox(height: 8.0),
-        Text('Pertanyaan 1'),
-        RadioListTile(
-          value: 1,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Sangat Baik'),
-        ),
-        RadioListTile(
-          value: 2,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Baik'),
-        ),
-        RadioListTile(
-          value: 3,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Cukup'),
-        ),
-        RadioListTile(
-          value: 4,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Kurang'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMataKuliahForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Penilaian Mata Kuliah',
-          style: TextStyles.body,
-        ),
-        SizedBox(height: 8.0),
-        Text('Pertanyaan 1'),
-        RadioListTile(
-          value: 1,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Sangat Baik'),
-        ),
-        RadioListTile(
-          value: 2,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Baik'),
-        ),
-        RadioListTile(
-          value: 3,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Cukup'),
-        ),
-        RadioListTile(
-          value: 4,
-          groupValue: 1,
-          onChanged: (value) {},
-          title: Text('Kurang'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFeedbackForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 16.0),
-        Text(
-          'Feedback',
-          style: TextStyles.body,
-        ),
-        SizedBox(height: 8.0),
-        TextFormField(
-          maxLines: 3,
-          decoration: InputDecoration(
-            hintText: 'Masukkan feedback Anda...',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        SizedBox(height: 16.0),
-        ElevatedButton(
-          onPressed: () {
-            // Logika untuk menyimpan penilaian dan feedback
-          },
-          child: Text('Submit'),
-        ),
-      ],
     );
   }
 }
