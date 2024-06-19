@@ -1,28 +1,22 @@
-// login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/register_screen.dart';
-import 'package:flutter_application_2/course_selection_screen.dart';
+import 'package:flutter_application_2/login_mahasiswa_screen.dart';
 import 'package:flutter_application_2/styles.dart';
 import 'package:flutter_application_2/widget/custom_textfield.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
-
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  bool isObscure = true;
+class RegisterMahasiswaScreen extends StatelessWidget {
+  const RegisterMahasiswaScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    bool isObscure = true;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Login',
+          'Register Mahasiswa',
           style: TextStyles.title,
         ),
         centerTitle: true,
@@ -35,18 +29,25 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/gambar/Login.png'),
+              Image.asset('assets/gambar/Register.png'),
               const SizedBox(height: 24.0),
               Text(
-                'Login Details',
+                'Register Details',
                 style: TextStyles.title.copyWith(fontSize: 20.0),
+              ),
+              const SizedBox(height: 24.0),
+              CustomTextfield(
+                controller: nameController,
+                textInputType: TextInputType.name,
+                textInputAction: TextInputAction.next,
+                hint: 'Full Name',
               ),
               const SizedBox(height: 24.0),
               CustomTextfield(
                 controller: emailController,
                 textInputType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
-                hint: 'Email or Username',
+                hint: 'Email',
               ),
               const SizedBox(height: 24.0),
               CustomTextfield(
@@ -57,13 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 isObscure: isObscure,
                 hasSuffix: true,
                 onPressed: () {
-                  setState(() {
-                    isObscure = !isObscure;
-                  });
+                  isObscure = !isObscure;
                 },
               ),
-              const SizedBox(height: 8.0),
-              Text('Forgot Password ?', style: TextStyles.body),
               const SizedBox(height: 24.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -73,17 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CourseSelectionScreen(),
-                    ),
-                  );
+                  // Handle registration logic
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
-                    'Login',
+                    'Register',
                     style: TextStyles.title
                         .copyWith(fontSize: 20.0, color: Colors.white),
                   ),
@@ -91,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24.0),
               Text(
-                'Don\'t have an account ?',
+                'Already have an account?',
                 style: TextStyles.body.copyWith(fontSize: 18.0),
                 textAlign: TextAlign.center,
               ),
@@ -100,12 +92,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => RegisterScreen(),
+                      builder: (context) => LoginMahasiswaScreen(),
                     ),
                   );
                 },
                 child: Text(
-                  'Sign Up',
+                  'Login',
                   style: TextStyles.body.copyWith(
                     fontSize: 18.0,
                     color: AppColors.darkBlue,

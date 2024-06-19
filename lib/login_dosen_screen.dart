@@ -1,23 +1,27 @@
-// register_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_application_2/login_screen.dart';
+import 'package:flutter_application_2/register_dosen_screen.dart';
+import 'package:flutter_application_2/course_selection_screen.dart';
 import 'package:flutter_application_2/styles.dart';
 import 'package:flutter_application_2/widget/custom_textfield.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+class LoginDosenScreen extends StatefulWidget {
+  const LoginDosenScreen({Key? key}) : super(key: key);
+
+  @override
+  _LoginDosenScreenState createState() => _LoginDosenScreenState();
+}
+
+class _LoginDosenScreenState extends State<LoginDosenScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isObscure = true;
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    bool isObscure = true;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Register',
+          'Login Dosen',
           style: TextStyles.title,
         ),
         centerTitle: true,
@@ -30,25 +34,18 @@ class RegisterScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset('assets/gambar/Register.png'),
+              Image.asset('assets/gambar/Login.png'),
               const SizedBox(height: 24.0),
               Text(
-                'Register Details',
+                'Login Details',
                 style: TextStyles.title.copyWith(fontSize: 20.0),
-              ),
-              const SizedBox(height: 24.0),
-              CustomTextfield(
-                controller: nameController,
-                textInputType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                hint: 'Full Name',
               ),
               const SizedBox(height: 24.0),
               CustomTextfield(
                 controller: emailController,
                 textInputType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
-                hint: 'Email',
+                hint: 'Email or Username',
               ),
               const SizedBox(height: 24.0),
               CustomTextfield(
@@ -59,9 +56,13 @@ class RegisterScreen extends StatelessWidget {
                 isObscure: isObscure,
                 hasSuffix: true,
                 onPressed: () {
-                  isObscure = !isObscure;
+                  setState(() {
+                    isObscure = !isObscure;
+                  });
                 },
               ),
+              const SizedBox(height: 8.0),
+              Text('Forgot Password ?', style: TextStyles.body),
               const SizedBox(height: 24.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -70,30 +71,44 @@ class RegisterScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CourseSelectionScreen(),
+                    ),
+                  );
+                },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
-                    'Register',
+                    'Login',
                     style: TextStyles.title
                         .copyWith(fontSize: 20.0, color: Colors.white),
                   ),
                 ),
               ),
               const SizedBox(height: 24.0),
+              Text(
+                'Don\'t have an account ?',
+                style: TextStyles.body.copyWith(fontSize: 18.0),
+                textAlign: TextAlign.center,
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LoginScreen(),
+                      builder: (context) => RegisterDosenScreen(),
                     ),
                   );
                 },
                 child: Text(
-                  'Already have an account ? Login',
-                  style: TextStyles.body
-                      .copyWith(fontSize: 18.0, color: AppColors.darkBlue),
+                  'Sign Up',
+                  style: TextStyles.body.copyWith(
+                    fontSize: 18.0,
+                    color: AppColors.darkBlue,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
