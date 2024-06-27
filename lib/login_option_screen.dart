@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'login_dosen_screen.dart';
 import 'login_mahasiswa_screen.dart';
-import 'styles.dart';  // Pastikan Anda sudah memiliki styles.dart dengan TextStyles dan AppColors
+import 'styles.dart';  
 
 class LoginOptionsScreen extends StatelessWidget {
   @override
@@ -33,7 +33,7 @@ class LoginOptionsScreen extends StatelessWidget {
                 Get.to(() => LoginDosenScreen());
               },
               child: Text(
-                'Login sebagai Dosen',
+                'Login sebagai Admin',
                 style: TextStyles.title.copyWith(color: Colors.white),
               ),
             ),

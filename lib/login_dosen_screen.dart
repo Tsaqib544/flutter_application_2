@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/register_dosen_screen.dart';
-import 'package:flutter_application_2/course_selection_screen.dart';
+import 'package:flutter_application_2/dosen_home_screen.dart';
 import 'package:flutter_application_2/styles.dart';
 import 'package:flutter_application_2/widget/custom_textfield.dart';
 
@@ -75,7 +75,7 @@ class _LoginDosenScreenState extends State<LoginDosenScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CourseSelectionScreen(),
+                      builder: (context) => DosenHomeScreen(),
                     ),
                   );
                 },
