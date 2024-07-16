@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "883481234086",
+    "project_id": "survei-dosen-dan-mata-kuliah",
+    "storage_bucket": "survei-dosen-dan-mata-kuliah.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883481234086:android:61b7460314f54687ca0267",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4qLoIYN1h9iGaYND_rcJZ2hOSP85gJME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

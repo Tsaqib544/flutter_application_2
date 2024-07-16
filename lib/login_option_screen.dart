@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'login_dosen_screen.dart';
+import 'login_screen.dart';
 import 'login_mahasiswa_screen.dart';
 import 'styles.dart';  
 

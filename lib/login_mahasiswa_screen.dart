@@ -37,7 +37,8 @@ class _LoginMahasiswaScreenState extends State<LoginMahasiswaScreen> {
               Image.asset('assets/gambar/Login.png'),
               const SizedBox(height: 24.0),
               Text(
-                'Login Details',
+
+                'Login',
                 style: TextStyles.title.copyWith(fontSize: 20.0),
               ),
               const SizedBox(height: 24.0),

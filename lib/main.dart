@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:hive/hive.dart';
 // import 'package:path_provider/path_provider.dart';
 
-void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // final documentsDir = await getApplicationDocumentsDirectory();
-  // Hive.init(documentsDir.path);
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

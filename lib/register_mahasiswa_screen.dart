@@ -32,7 +32,7 @@ class RegisterMahasiswaScreen extends StatelessWidget {
               Image.asset('assets/gambar/Register.png'),
               const SizedBox(height: 24.0),
               Text(
-                'Register Details',
+                'Register',
                 style: TextStyles.title.copyWith(fontSize: 20.0),
               ),
               const SizedBox(height: 24.0),
