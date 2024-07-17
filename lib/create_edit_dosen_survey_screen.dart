@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateEditDosenSurveyScreen extends StatefulWidget {
   final String? dosenName;
   final bool isEditing;
 
-  const CreateEditDosenSurveyScreen({Key? key, this.dosenName, this.isEditing = false}) : super(key: key);
+  const CreateEditDosenSurveyScreen(
+      {Key? key, this.dosenName, this.isEditing = false})
+      : super(key: key);
 
   @override
-  _CreateEditDosenSurveyScreenState createState() => _CreateEditDosenSurveyScreenState();
+  _CreateEditDosenSurveyScreenState createState() =>
+      _CreateEditDosenSurveyScreenState();
 }
 
-class _CreateEditDosenSurveyScreenState extends State<CreateEditDosenSurveyScreen> {
+class _CreateEditDosenSurveyScreenState
+    extends State<CreateEditDosenSurveyScreen> {
   final List<SurveyFormField> _formFields = [];
   final TextEditingController _surveyTitleController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
     if (widget.isEditing && widget.dosenName != null) {
-      // Load existing survey data if editing
       _surveyTitleController.text = "Survey for ${widget.dosenName}";
+      _loadSurveyData();
     }
+  }
+
+  void _loadSurveyData() async {
+    // Logic to load existing survey data from Firebase
   }
 
   void _addFormField(FormFieldType fieldType) {
@@ -38,11 +48,29 @@ class _CreateEditDosenSurveyScreenState extends State<CreateEditDosenSurveyScree
     });
   }
 
+  Future<void> _saveSurvey() async {
+    List<Map<String, dynamic>> questions = _formFields.map((field) {
+      return {
+        'type': field.type.toString(),
+        'label': field.textController.text,
+        'description': field.descriptionController.text,
+        'options': field.getOptions(),
+      };
+    }).toList();
+
+    await _firestore.collection('surveys').add({
+      'title': _surveyTitleController.text,
+      'questions': questions,
+      'dosenName': widget.dosenName,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit Dosen Survey' : 'Create Dosen Survey'),
+        title: Text(
+            widget.isEditing ? 'Edit Dosen Survey' : 'Create Dosen Survey'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -162,8 +190,9 @@ class _CreateEditDosenSurveyScreenState extends State<CreateEditDosenSurveyScree
               ),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                // Save survey logic
+              onPressed: () async {
+                await _saveSurvey();
+                Navigator.pop(context);
               },
               icon: Icon(Icons.save),
               label: Text('Simpan Survei'),
@@ -191,11 +220,19 @@ class SurveyFormField extends StatelessWidget {
   final FormFieldType type;
   final String label;
   final ValueChanged<SurveyFormField> onDelete;
-  final TextEditingController _textController;
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController textController;
+  final TextEditingController descriptionController = TextEditingController();
+  final GlobalKey<_RadioGroupState> _radioGroupKey =
+      GlobalKey<_RadioGroupState>();
+  final GlobalKey<_CheckboxGroupState> _checkboxGroupKey =
+      GlobalKey<_CheckboxGroupState>();
 
-  SurveyFormField({Key? key, required this.type, required this.label, required this.onDelete})
-      : _textController = TextEditingController(text: label),
+  SurveyFormField(
+      {Key? key,
+      required this.type,
+      required this.label,
+      required this.onDelete})
+      : textController = TextEditingController(text: label),
         super(key: key);
 
   @override
@@ -221,7 +258,7 @@ class SurveyFormField extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
-                controller: _textController,
+                controller: textController,
                 decoration: InputDecoration(labelText: 'Judul Pertanyaan'),
                 onChanged: (value) {
                   // Handle changes if needed
@@ -230,11 +267,10 @@ class SurveyFormField extends StatelessWidget {
               SizedBox(height: 8.0),
               _buildFormField(type),
               SizedBox(height: 8.0),
-              ListTile(
-                title: TextField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(labelText: 'Deskripsi/Jawaban Singkat'),
-                ),
+              TextField(
+                controller: descriptionController,
+                decoration:
+                    InputDecoration(labelText: 'Deskripsi/Jawaban Singkat'),
               ),
             ],
           ),
@@ -246,9 +282,9 @@ class SurveyFormField extends StatelessWidget {
   Widget _buildFormField(FormFieldType type) {
     switch (type) {
       case FormFieldType.radio:
-        return RadioGroup(label: label);
+        return RadioGroup(key: _radioGroupKey, label: label);
       case FormFieldType.checkbox:
-        return CheckboxGroup(label: label);
+        return CheckboxGroup(key: _checkboxGroupKey, label: label);
       case FormFieldType.dropdown:
         return DropdownField(label: label);
       case FormFieldType.file:
@@ -267,9 +303,19 @@ class SurveyFormField extends StatelessWidget {
         return Container();
     }
   }
+
+  List<String> getOptions() {
+    switch (type) {
+      case FormFieldType.radio:
+        return _radioGroupKey.currentState?._options ?? [];
+      case FormFieldType.checkbox:
+        return _checkboxGroupKey.currentState?._options ?? [];
+      default:
+        return [];
+    }
+  }
 }
 
-// Define the widgets for each form field type
 class RadioGroup extends StatefulWidget {
   final String label;
 
@@ -287,20 +333,8 @@ class _RadioGroupState extends State<RadioGroup> {
   @override
   void initState() {
     super.initState();
-    _controllers.addAll(_options.map((option) => TextEditingController(text: option)));
-  }
-
-  void _onOptionChanged(String? value) {
-    setState(() {
-      _selectedOption = value;
-    });
-  }
-
-  void _updateOption(int index, String value) {
-    setState(() {
-      _options[index] = value;
-      _controllers[index].text = value;
-    });
+    _controllers
+        .addAll(_options.map((option) => TextEditingController(text: option)));
   }
 
   @override
@@ -314,42 +348,47 @@ class _RadioGroupState extends State<RadioGroup> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          children: _options
-              .asMap()
-              .map((index, option) => MapEntry(
-                    index,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _controllers[index],
-                            decoration: InputDecoration(labelText: 'Opsi ${index + 1}'),
-                            onChanged: (value) => _updateOption(index, value),
-                          ),
-                        ),
-                        Radio<String>(
-                          value: option,
-                          groupValue: _selectedOption,
-                          onChanged: _onOptionChanged,
-                        ),
-                      ],
-                    ),
-                  ))
-              .values
-              .toList(),
-        ),
-        TextButton.icon(
+        for (var i = 0; i < _options.length; i++)
+          Row(
+            children: [
+              Radio<String>(
+                value: _options[i],
+                groupValue: _selectedOption,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedOption = value;
+                  });
+                },
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _controllers[i],
+                  onChanged: (value) {
+                    _options[i] = value;
+                  },
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    _options.removeAt(i);
+                    _controllers.removeAt(i).dispose();
+                  });
+                },
+              ),
+            ],
+          ),
+        TextButton(
           onPressed: () {
             setState(() {
               _options.add('Opsi ${_options.length + 1}');
-              _controllers.add(TextEditingController(text: 'Opsi ${_options.length}'));
+              _controllers
+                  .add(TextEditingController(text: 'Opsi ${_options.length}'));
             });
           },
-          icon: Icon(Icons.add),
-          label: Text('Tambah Opsi'),
+          child: Text('Tambahkan Opsi'),
         ),
       ],
     );
@@ -373,14 +412,8 @@ class _CheckboxGroupState extends State<CheckboxGroup> {
   @override
   void initState() {
     super.initState();
-    _controllers.addAll(_options.map((option) => TextEditingController(text: option)));
-  }
-
-  void _updateOption(int index, String value) {
-    setState(() {
-      _options[index] = value;
-      _controllers[index].text = value;
-    });
+    _controllers
+        .addAll(_options.map((option) => TextEditingController(text: option)));
   }
 
   @override
@@ -394,46 +427,48 @@ class _CheckboxGroupState extends State<CheckboxGroup> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          children: _options
-              .asMap()
-              .map((index, option) => MapEntry(
-                    index,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _controllers[index],
-                            decoration: InputDecoration(labelText: 'Opsi ${index + 1}'),
-                            onChanged: (value) => _updateOption(index, value),
-                          ),
-                        ),
-                        Checkbox(
-                          value: _selectedOptions[index],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedOptions[index] = value ?? false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ))
-              .values
-              .toList(),
-        ),
-        TextButton.icon(
+        for (var i = 0; i < _options.length; i++)
+          Row(
+            children: [
+              Checkbox(
+                value: _selectedOptions[i],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedOptions[i] = value!;
+                  });
+                },
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _controllers[i],
+                  onChanged: (value) {
+                    _options[i] = value;
+                  },
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    _options.removeAt(i);
+                    _selectedOptions.removeAt(i);
+                    _controllers.removeAt(i).dispose();
+                  });
+                },
+              ),
+            ],
+          ),
+        TextButton(
           onPressed: () {
             setState(() {
               _options.add('Opsi ${_options.length + 1}');
               _selectedOptions.add(false);
-              _controllers.add(TextEditingController(text: 'Opsi ${_options.length}'));
+              _controllers
+                  .add(TextEditingController(text: 'Opsi ${_options.length}'));
             });
           },
-          icon: Icon(Icons.add),
-          label: Text('Tambah Opsi'),
+          child: Text('Tambahkan Opsi'),
         ),
       ],
     );
@@ -442,117 +477,77 @@ class _CheckboxGroupState extends State<CheckboxGroup> {
 
 class DropdownField extends StatelessWidget {
   final String label;
-  final List<String> _options = ['Opsi 1', 'Opsi 2', 'Opsi 3'];
 
-  DropdownField({Key? key, required this.label}) : super(key: key);
+  const DropdownField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(labelText: label),
-      items: _options.map((String option) {
-        return DropdownMenuItem<String>(
-          value: option,
-          child: Text(option),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        // Handle dropdown changes if needed
-      },
-    );
+    return Container();
   }
 }
 
 class FileField extends StatelessWidget {
   final String label;
 
-  FileField({Key? key, required this.label}) : super(key: key);
+  const FileField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        SizedBox(height: 8.0),
-        ElevatedButton.icon(
-          onPressed: () {
-            // Handle file upload logic
-          },
-          icon: Icon(Icons.upload_file),
-          label: Text('Upload File'),
-        ),
-      ],
-    );
+    return Container();
   }
 }
 
 class LinearScaleField extends StatelessWidget {
   final String label;
 
-  LinearScaleField({Key? key, required this.label}) : super(key: key);
+  const LinearScaleField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label),
-        Slider(
-          value: 0,
-          min: 0,
-          max: 10,
-          divisions: 10,
-          label: '0',
-          onChanged: (double value) {
-            // Handle slider changes
-          },
-        ),
-      ],
-    );
+    return Container();
   }
 }
 
 class GridField extends StatelessWidget {
   final String label;
 
-  GridField({Key? key, required this.label}) : super(key: key);
+  const GridField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(label); // Implement grid field widget
+    return Container();
   }
 }
 
 class TableField extends StatelessWidget {
   final String label;
 
-  TableField({Key? key, required this.label}) : super(key: key);
+  const TableField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(label); // Implement table field widget
+    return Container();
   }
 }
 
 class DateField extends StatelessWidget {
   final String label;
 
-  DateField({Key? key, required this.label}) : super(key: key);
+  const DateField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(label); // Implement date field widget
+    return Container();
   }
 }
 
 class TimeField extends StatelessWidget {
   final String label;
 
-  TimeField({Key? key, required this.label}) : super(key: key);
+  const TimeField({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(label); // Implement time field widget
+    return Container();
   }
 }

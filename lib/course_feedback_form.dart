@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_2/styles.dart';
-import 'package:flutter_application_2/feedback_summary_screen.dart';
 
 class CourseFeedbackForm extends StatefulWidget {
   final String courseName;
@@ -13,15 +13,26 @@ class CourseFeedbackForm extends StatefulWidget {
 }
 
 class _CourseFeedbackFormState extends State<CourseFeedbackForm> {
-  Map<String, String?> _ratings = {
+  final Map<String, String?> _ratings = {
     'Kesesuaian materi kuliah dengan tujuan pembelajaran': null,
     'Kejelasan penyampaian materi oleh dosen': null,
     'Kesesuaian beban tugas dengan kemampuan mahasiswa': null,
     'Keefektifan sarana dan prasarana yang digunakan': null,
-    'Mata kuliah ini bermanfaat untuk meningkatkan pengetahuan dan keterampilan saya':
-        null,
+    'Mata kuliah ini bermanfaat untuk meningkatkan pengetahuan dan keterampilan saya': null,
   };
-  TextEditingController _feedbackController = TextEditingController();
+  final TextEditingController _feedbackController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> _submitFeedback() async {
+    Map<String, dynamic> feedbackData = {
+      'courseName': widget.courseName,
+      'ratings': _ratings,
+      'additionalFeedback': _feedbackController.text,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    await _firestore.collection('feedbacks').add(feedbackData);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,21 +141,9 @@ class _CourseFeedbackFormState extends State<CourseFeedbackForm> {
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                Map<String, dynamic> feedback = {
-                  'title': 'Feedback for ${widget.courseName}',
-                  'subtitle': widget.courseName,
-                  'ratings': _ratings,
-                  'feedback': _feedbackController.text,
-                };
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FeedbackSummaryScreen(
-                      feedbackList: [feedback],
-                    ),
-                  ),
-                );
+              onPressed: () async {
+                await _submitFeedback();
+                Navigator.pop(context);
               },
               child: Text('Kirim Feedback', style: TextStyles.body),
             ),

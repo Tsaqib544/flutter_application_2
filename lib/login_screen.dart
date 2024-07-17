@@ -50,18 +50,25 @@ class _LoginScreenState extends State<LoginScreen> {
             .collection('users')
             .doc(userCredential.user!.uid)
             .get();
-        String role = userDoc['role'];
 
-        if (role == 'admin') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DosenHomeScreen()),
-          );
-        } else if (role == 'user') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CourseSelectionScreen()),
-          );
+        if (userDoc.exists) {
+          String role = userDoc['role'];
+
+          if (role == 'admin') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DosenHomeScreen()),
+            );
+          } else if (role == 'user') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CourseSelectionScreen()),
+            );
+          }
+        } else {
+          setState(() {
+            errorMessage = 'User document does not exist';
+          });
         }
       } catch (e) {
         setState(() {

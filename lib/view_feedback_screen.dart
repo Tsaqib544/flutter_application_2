@@ -1,39 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ViewFeedbackScreen extends StatelessWidget {
   const ViewFeedbackScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Placeholder data
-    final List<Map<String, String>> feedbackList = [
-      {'title': 'Survey for Vihi Atina, M.Kom', 'feedback': 'Very knowledgeable and engaging.'},
-      {'title': 'Survey for Triyono, M.Kom', 'feedback': 'Good explanations but could use more examples.'},
-      {'title': 'Survey for Joni Maulindar, S.T, M.Kom', 'feedback': 'Great lecturer, very clear and concise.'},
-      {'title': 'Survey for Pemrograman Mobile', 'feedback': 'Course content was very relevant and up-to-date.'},
-      {'title': 'Survey for Kecerdasan Mesin dan Buatan', 'feedback': 'Interesting subject but tough to grasp at times.'},
-      {'title': 'Survey for Pemrograman Visual', 'feedback': 'Fun and interactive classes, learned a lot.'},
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Feedback'),
+        title: Text('Lihat Feedback'),
+        backgroundColor: Colors.blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: feedbackList.length,
-          itemBuilder: (context, index) {
-            final feedback = feedbackList[index];
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 8.0),
-              child: ListTile(
-                title: Text(feedback['title']!),
-                subtitle: Text(feedback['feedback']!),
-              ),
-            );
-          },
-        ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('feedbacks').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Terjadi kesalahan'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('Tidak ada feedback'));
+          }
+
+          var feedbacks = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: feedbacks.length,
+            itemBuilder: (context, index) {
+              var feedback = feedbacks[index];
+              return Card(
+                margin: EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text(feedback['courseName'] ?? 'No Title'),
+                  subtitle:
+                      Text(feedback['additionalFeedback'] ?? 'No Description'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(feedback['courseName'] ?? 'No Title'),
+                        content: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Penilaian:'),
+                            ...feedback['ratings'].entries.map<Widget>((entry) {
+                              return Text('${entry.key}: ${entry.value}');
+                            }).toList(),
+                            SizedBox(height: 10),
+                            Text('Feedback tambahan:'),
+                            Text(feedback['additionalFeedback'] ?? 'Tidak ada'),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Tutup'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
